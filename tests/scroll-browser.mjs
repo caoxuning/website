@@ -1,0 +1,64 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import {mkdir,writeFile} from 'node:fs/promises';
+
+const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,args:['--enable-webgl','--use-angle=d3d11']});
+const page=await browser.newPage({viewport:{width:1440,height:900}});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const idle=()=>page.waitForFunction(()=>document.body.dataset.transitioning==='false');
+const snapshot=()=>page.evaluate(()=>({index:document.body.dataset.activePanel,phase:document.body.dataset.transitionPhase,progress:Number(document.body.dataset.scrollProgress),hash:location.hash,oldAlpha:Number(getComputedStyle(document.querySelector('#home')).opacity),nextAlpha:Number(getComputedStyle(document.querySelector('#perspective')).opacity),oldY:new DOMMatrix(getComputedStyle(document.querySelector('#home')).transform).m42}));
+const wheel=delta=>page.evaluate(y=>dispatchEvent(new WheelEvent('wheel',{deltaY:y,cancelable:true})),delta);
+try{
+  await mkdir('test-results/scroll',{recursive:true});
+  await page.goto('http://127.0.0.1:5188/#home',{waitUntil:'networkidle'});
+  await page.mouse.wheel(0,120);await page.waitForTimeout(160);
+  const first=await snapshot();
+  assert.equal(first.phase,'dragging','sub-threshold wheel must drive a live preview');
+  assert.equal(first.index,'0');assert.ok(first.oldY<0);assert.equal(first.oldAlpha,1);
+  await wheel(180);await page.waitForTimeout(150);
+  const half=await snapshot();
+  assert.ok(half.progress>.45&&half.progress<.6);assert.ok(half.oldAlpha>.5);assert.ok(half.nextAlpha>0);
+  assert.ok(await page.locator('#home .chapter-inner').evaluate(el=>Number(getComputedStyle(el).opacity))<.5);
+  assert.equal(await page.locator('#perspective .science-heading').evaluate(el=>Number(getComputedStyle(el).opacity)),0,'incoming text waits until outgoing text has faded');
+  assert.ok(await page.locator('body').evaluate(el=>Number(el.style.getPropertyValue('--scroll-progress')))> .45);
+  assert.equal(half.hash,'#home','preview must not create history');
+  await page.screenshot({path:'test-results/scroll/half-progress.png'});
+  await idle();assert.equal((await snapshot()).index,'0');assert.equal((await snapshot()).oldAlpha,1);
+  await page.screenshot({path:'test-results/scroll/returned.png'});
+
+  await wheel(240);await page.waitForTimeout(100);await wheel(-120);await page.waitForTimeout(150);
+  assert.ok((await snapshot()).progress<.25,'reverse unwinds visible progress');
+  await idle();
+  await wheel(-600);await page.waitForTimeout(100);assert.equal((await snapshot()).index,'0','first section cannot overscroll');
+  await page.waitForTimeout(600);
+  await wheel(360);await page.waitForTimeout(180);
+  assert.equal((await snapshot()).index,'1');
+  await page.screenshot({path:'test-results/scroll/committed.png'});
+  await page.evaluate(async()=>{for(let i=0;i<15;i++){await new Promise(r=>setTimeout(r,80));dispatchEvent(new WheelEvent('wheel',{deltaY:100,cancelable:true}));}});
+  await idle();assert.equal((await snapshot()).index,'1','momentum cannot skip chapters');
+  await page.waitForTimeout(600);
+  await wheel(-360);await idle();assert.equal((await snapshot()).index,'0');
+
+  await page.waitForTimeout(600);await wheel(240);await page.waitForTimeout(80);
+  await page.locator('.deck-rail a[href="#research"]').click();await idle();
+  assert.equal((await snapshot()).index,'4','navigation interrupts an uncommitted preview');
+  await page.goBack();
+  assert.equal((await snapshot()).phase,'settling','popstate plus hashchange must not cancel the same transition');
+  await idle();assert.equal((await snapshot()).index,'0');
+  await page.waitForTimeout(600);await wheel(240);await page.waitForTimeout(80);
+  await page.locator('[data-contact]').first().click();
+  assert.equal((await snapshot()).phase,'idle','opening a dialog cancels a preview');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(600);await wheel(240);await page.waitForTimeout(80);
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await page.locator('[data-panel][inert]').count(),0);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth),0);
+  await page.setViewportSize({width:1024,height:768});await idle();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth),0);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await wheel(360);await idle();
+  assert.equal(await page.locator('body').getAttribute('data-transition-phase'),'idle');
+  assert.deepEqual(errors,[]);
+  await writeFile('test-results/scroll/verification.json',JSON.stringify({first,half,errors,checks:['progress','fade','release rollback','reverse unwind','edge bounds','60% commit','momentum latch','link/history interruption','dialog cancellation','resize cleanup','390/1024 overflow','reduced motion']},null,2));
+  console.log('PASS: progress-driven scrolling and interruption regressions');
+}finally{await browser.close();}
