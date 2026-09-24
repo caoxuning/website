@@ -23,6 +23,16 @@ async function progress(selector,position){
   },position);
 }
 
+async function chapterProgress(sectionSelector,textSelector,sectionTop){
+  return page.evaluate(async({sectionSelector,textSelector,sectionTop})=>{
+    const section=document.querySelector(sectionSelector);
+    scrollTo({top:section.getBoundingClientRect().top+scrollY-sectionTop,behavior:'instant'});
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    const element=document.querySelector(textSelector);
+    return {progress:Number(element.style.getPropertyValue('--reveal-progress')),offset:parseFloat(element.style.getPropertyValue('--reveal-y')),clip:getComputedStyle(element).clipPath};
+  },{sectionSelector,textSelector,sectionTop});
+}
+
 try{
   await page.goto('http://127.0.0.1:5188/#home',{waitUntil:'networkidle'});
   const commercialLines=page.locator('#commercial-title .story-line-text');
@@ -57,7 +67,48 @@ try{
   }
   await progress('#commercial-title .story-line:first-child .story-line-text','visible');
   await page.screenshot({path:`${output}/commercial-reentry.png`});
+  for(const [section,text] of [
+    ['#computation','#compute-title .story-line:first-child .story-line-text'],
+    ['#platform','#platform-title .story-line:first-child .story-line-text'],
+    ['#research','#research-title .story-line:first-child .story-line-text'],
+    ['#inquiry','#inquiry-title'],
+  ]){
+    const entering=await chapterProgress(section,text,500);
+    const reading=await chapterProgress(section,text,300);
+    const settled=await chapterProgress(section,text,0);
+    const rewound=await chapterProgress(section,text,800);
+    assert.ok(entering.progress<.8,`${text}: headline must not finish before the chapter is read`);
+    assert.ok(reading.progress>.1&&reading.progress<.95,`${text}: headline moves through the reading zone`);
+    assert.ok(settled.progress>.98,`${text}: headline settles at chapter start`);
+    assert.ok(rewound.progress<.05,`${text}: headline motion reverses`);
+    assert.ok(reading.offset>3&&reading.offset<55,`${text}: the whole headline line travels through the reading zone`);
+    assert.equal(reading.clip,'none',`${text}: letters are not sliced by a hard mask`);
+  }
+  const researchCopy=await chapterProgress('#research','#research-title .story-line:first-child .story-line-text',300);
+  const researchBody=await page.locator('#research').evaluate(section=>({
+    copy:Number(getComputedStyle(section.querySelector('.chapter-copy')).opacity),
+    facts:Number(getComputedStyle(section.querySelector('.case-facts')).opacity),
+  }));
+  assert.ok(researchCopy.progress>.1&&researchBody.copy>.65&&researchBody.facts>.65,'research context remains readable while its headline is still entering');
+  assert.ok(await page.locator('#collaboration-title').evaluate(el=>el.hasAttribute('data-reveal')),'closing invitation has its own text reveal');
   await page.setViewportSize({width:390,height:844});
+  await chapterProgress('#computation','#compute-title .story-line:first-child .story-line-text',152);
+  const serviceExit=await page.locator('#computation').evaluate(section=>({
+    description:Number(getComputedStyle(section.querySelector('#spatial-description')).opacity),
+    action:Number(getComputedStyle(section.querySelector('.spatial-controls .text-link')).opacity),
+  }));
+  assert.ok(serviceExit.description>.75&&serviceExit.action>.85,'service explanation and next action read clearly when arriving by anchor');
+  for(const id of ['computation','platform','research','inquiry']){
+    const gap=await page.evaluate(async id=>{
+      const section=document.getElementById(id);
+      scrollTo({top:section.getBoundingClientRect().top+scrollY-300,behavior:'instant'});
+      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      const heading=section.querySelector('h2 .story-line:last-child .story-line-text')||section.querySelector('h2');
+      const copy=section.querySelector('.science-heading>p,.chapter-lead,.inquiry-content p');
+      return copy.getBoundingClientRect().top-heading.getBoundingClientRect().bottom;
+    },id);
+    assert.ok(gap>=0,`${id}: moving headline does not overlap its supporting copy on mobile`);
+  }
   const mobileBefore=await progress('#commercial-title .story-line:first-child .story-line-text','before');
   const mobileEntered=await progress('#commercial-title .story-line:first-child .story-line-text','visible');
   const mobileReturned=await progress('#commercial-title .story-line:first-child .story-line-text','passed');
@@ -65,11 +116,15 @@ try{
   await page.locator('#motion-toggle').click();
   await progress('#commercial-title .story-line:first-child .story-line-text','before');
   assert.equal(await commercialLines.first().evaluate(el=>Number(getComputedStyle(el).opacity)),1,'pause keeps content readable');
+  await chapterProgress('#computation','#compute-title .story-line:first-child .story-line-text',800);
+  assert.deepEqual(await page.locator('#compute-title .story-line:first-child .story-line-text').evaluate(el=>({opacity:getComputedStyle(el).opacity,clip:getComputedStyle(el).clipPath})),{opacity:'1',clip:'none'},'pause exposes the complete lower-chapter headline');
   await page.locator('#motion-toggle').click();
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.reload({waitUntil:'networkidle'});
   await progress('#commercial-title .story-line:first-child .story-line-text','before');
   assert.equal(await commercialLines.first().evaluate(el=>Number(getComputedStyle(el).opacity)),1,'reduced motion keeps content readable');
+  await chapterProgress('#research','#research-title .story-line:first-child .story-line-text',800);
+  assert.deepEqual(await page.locator('#research-title .story-line:first-child .story-line-text').evaluate(el=>({opacity:getComputedStyle(el).opacity,clip:getComputedStyle(el).clipPath})),{opacity:'1',clip:'none'},'reduced motion exposes the complete research headline');
   assert.deepEqual(errors,[]);
   console.log('PASS: scroll-linked text/image motion replays in both directions and honors pause/reduced motion');
 }finally{await browser.close();}

@@ -40,7 +40,11 @@ try{
         assert.ok(layout.scene.top>=layout.actions.bottom+8,`${width}x${height}: hero scene overlaps the actions`);
         assert.ok(layout.bottom.top>=layout.scene.bottom-1,`${width}x${height}: hero footer overlaps the scene`);
       }
-      if(id==='computation'||id==='platform'){
+      if(id==='computation'){
+        if(width>=900)assert.ok(layout.content.right<=layout.scene.left+1,`${width}x${height} ${id}: process overlaps the stage`);
+        else assert.ok(layout.content.bottom<=layout.scene.top+1,`${width}x${height} ${id}: stacked process overlaps the stage`);
+      }
+      if(id==='platform'){
         if(width>=1200)assert.ok(layout.scene.right<=layout.content.left+1,`${width}x${height} ${id}: side-by-side content overlaps the stage`);
         else assert.ok(layout.scene.bottom<=layout.content.top+1,`${width}x${height} ${id}: stacked content overlaps the stage`);
       }

@@ -6,11 +6,11 @@ export function installReveals({onHeroProgress=()=>{},onSafeProgress=()=>{}}={})
     '.commercial-head .story-line-text','.commercial-head>p','.commercial-lines>div','.commercial-actions',
     '.science-heading .story-line-text','.science-heading>p',
     '.solutions .solution-tabs','.solutions .solution-preview','.solutions .technology-pulse',
-    '.spatial-controls','.data-deliverables',
-    '.analysis-sidebar','.technical-foundation',
-    '.research-story .story-line-text','.research-story .chapter-lead','.research-story .chapter-copy','.research-story .case-facts','.research-image',
-    '.inquiry-content','.team-member',
-    '.collaboration-band','.footer-columns'
+    '.delivery .spatial-modes button','.delivery #spatial-description','.delivery .spatial-controls .text-link','.data-deliverables',
+    '.analysis .perspective-tabs button','.analysis .perspective-panel','.technical-foundation',
+    '.research-story .story-line-text','.research-story .chapter-lead','.research-story .chapter-copy','.research-story .case-facts','.research-story .text-link','.research-image',
+    '.inquiry-content h2','.inquiry-content p','.team-member','.archive-note',
+    '.collaboration-band .eyebrow','.collaboration-band h3','.collaboration-band p:not(.eyebrow)','.collaboration-band .footer-cta','.footer-columns'
   ];
   const elements=[...document.querySelectorAll(selectors.join(','))];
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -20,11 +20,16 @@ export function installReveals({onHeroProgress=()=>{},onSafeProgress=()=>{}}={})
   const safeSection=document.querySelector('#perspective');
   const states=elements.map(element=>{
     element.dataset.reveal='';
-    const siblings=element.matches('.commercial-lines>div,.team-member')?[...element.parentElement.children]:null;
+    const siblings=element.matches('.commercial-lines>div,.team-member,.delivery .spatial-modes button,.analysis .perspective-tabs button')?[...element.parentElement.children]:null;
     const line=element.matches('.story-line-text');
     const lineIndex=line?[...element.parentElement.parentElement.children].indexOf(element.parentElement):0;
     const prose=element.matches('.commercial-head>p,.science-heading>p,.research-story .chapter-lead,.research-story .chapter-copy,.research-story .case-facts');
-    return {element,y:0,amplitude:line?42:24,delay:line?lineIndex*48:prose?115:siblings?siblings.indexOf(element)*38:0};
+    const lower=!!element.closest('#computation,#platform,#research,#inquiry');
+    const headline=line||element.matches('.inquiry-content h2,.collaboration-band h3');
+    const lateHeadline=lower&&headline&&!element.closest('.collaboration-band');
+    const earlyProse=element.matches('.research-story .chapter-lead,.research-story .chapter-copy,.research-story .case-facts');
+    const earlyService=element.matches('.delivery #spatial-description,.delivery .spatial-controls .text-link');
+    return {element,y:0,lateHeadline,earlyProse,earlyService,amplitude:headline?(lower?30:42):24,delay:line?lineIndex*(lower?60:48):earlyProse||earlyService?0:prose?115:siblings?siblings.indexOf(element)*38:0};
   });
   let frame=0;
 
@@ -39,7 +44,13 @@ export function installReveals({onHeroProgress=()=>{},onSafeProgress=()=>{}}={})
       const appliedY=motionOff?0:state.y;
       const top=rect.top-appliedY;
       const bottom=rect.bottom-appliedY;
-      const enter=clamp((viewport*.98-top-state.delay)/enterDistance);
+      const enter=state.lateHeadline
+        ?clamp((viewport*.8-top-state.delay)/Math.min(380,viewport*.44))
+        :state.earlyService
+        ?clamp((viewport*1.15-top)/enterDistance)
+        :state.earlyProse
+        ?clamp((viewport*1.08-top)/enterDistance)
+        :clamp((viewport*.98-top-state.delay)/enterDistance);
       const exit=clamp((bottom+30)/exitDistance);
       const progress=Math.min(enter,exit);
       const eased=progress*progress*(3-2*progress);

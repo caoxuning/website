@@ -94,7 +94,7 @@ function prepareTissue(focused=false){
   tissueAssets.set(focused,assets);return assets;
 }
 
-export function createCellScene(canvas,{mode=0,onCycle=()=>{}}={}) {
+export function createCellScene(canvas,{mode=0,onCycle=()=>{},hideNarrowScan=false}={}) {
   const root = canvas.parentElement;
   const solutionScene=mode===1&&!!canvas.closest('.solutions');
   let renderer;
@@ -195,7 +195,7 @@ export function createCellScene(canvas,{mode=0,onCycle=()=>{}}={}) {
     if(solutionScene){cluster.position.set(0,0,0);cluster.scale.setScalar(narrow?1.15:1.5);}
     else if(narrow){
       cluster.position.set(0,0,0);
-      cluster.scale.setScalar(mode===0?1.15:1.05);
+      cluster.scale.setScalar(mode===0?1.15:1.38);
       camera.position.z=23;
     }else if(mode===0){cluster.position.set(camera.aspect*(width<1150?3.15:2.85),-.05,0);cluster.scale.setScalar(width>1700?1.56:width<1150?1.16:1.47);}
     else{cluster.position.set(0,0,0);cluster.scale.setScalar(width<800?1.28:1.4);}
@@ -244,7 +244,7 @@ export function createCellScene(canvas,{mode=0,onCycle=()=>{}}={}) {
       layer.position.set(x,y,.3);
     });
     regions.forEach(region=>{region.visible=spatialStage===2;});
-    scan.visible=mode===1&&cycle.step===1&&(!solutionScene||solution===0);
+    scan.visible=mode===1&&cycle.step===1&&(!solutionScene||solution===0)&&!(hideNarrowScan&&narrow);
     scan.position.y=3.6-stainingScan(cycle,time,solutionScene&&!narrow)*7.2;
     scan.scale.x=solutionScene&&narrow?.8:1;
     renderer.render(scene,camera);

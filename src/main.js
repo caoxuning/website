@@ -3,6 +3,7 @@ import './business-refinement.css';
 import './interactions.css';
 import './continuous.css';
 import './spatial-lens.css';
+import './lower-story.css';
 import {createIcons, ArrowUpRight, ArrowDown, ArrowRight,Layers,ScanLine,MapPin,Check,Pause, Play, X, Download} from 'lucide';
 import {createCellScene} from './scene.js';
 import {createDeck} from './continuous-deck.js';

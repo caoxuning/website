@@ -1,5 +1,26 @@
 # Verification / 2026-09-22
 
+## v0.2.0-preview Release / 2026-09-25
+
+- `npm.cmd test`: 28/28 passing. Homepage, story, legacy, and content-audit browser checks passed; story/canvas coverage includes 1920x1080, 1440x900, 1024x768 and 390x844, with no horizontal overflow, page errors or missing images. The story checks cover moving/nonblank 3D pixels, pointer response, pause, reduced motion, anchors and history. Local consultation draft download remains verified.
+- `npm.cmd run build`: passed. The static archive contains 23 files, each SHA-256 matched to `dist`. Archive SHA-256: `619D55820B2D0A4501EE42AD02FB0609ADF6271198CD85509578586C3855E4CB`.
+- This is a preview release, not publication clearance. See `docs/content-audit.md` for outstanding image, fixed-sample SAFE, team, service and contact checks.
+
+## Revision 19: Continuous Tissue Field and Text Rhythm / 2026-09-24
+
+- The service chapter now shares the exact graphite background of the technology chapter and its WebGL clear color. Its process controls, captions, provisional deliverables and next-section link use light, legible colors; the historical research spread remains the intentional light transition. The existing 3D coordinates, scene controls and source qualifications are unchanged.
+- `tests/lower-story.mjs` was first made to fail against the prior light service background, then passed the common field, matched canvas background, text contrast, compact layout and mobile flow. `tests/scroll-reveal.mjs` checks staged lower-chapter headings at intermediate positions, reversal, non-clipping, research body readability, pause and reduced motion. A screenshot review found the service next-section action too dim on anchor arrival; a failing anchor-state regression reproduced it, then passed after its reveal was moved earlier.
+- Fresh desktop and mobile screenshots, including mid-scroll frames, are in `test-results/lower-motion/`. The fresh mobile 03 transition remains graphite and the 05 transition shows a readable evidence/status bridge. An independent image-only reviewer reported no blocker and identified the dim action, which was fixed. One reviewed transition image predated the graphite recolor and was replaced by fresh screenshots. Reviewer inherited the current Codex model; exact billing was unavailable.
+- Final checks: `npm.cmd test` 28/28; `tests/lower-story.mjs`, `tests/scroll-reveal.mjs`, `tests/responsive-browser.mjs` (nine viewports, zero horizontal overflow at 1024 and 390px, canvas pixel and aspect-ratio checks), `tests/continuous-browser.mjs` (navigation/history, local draft, WebGL pixels), `tests/solution-interaction.mjs` (keyboard, pointer, pause) and `npm.cmd run build` passed. Historical image association, company service scope, team roles and formal contact information still require confirmation before publication.
+
+## Revision 18: Lower-Chapter Art Direction / 2026-09-24
+
+- Scope: chapters 03–06 only, plus a narrow-viewport scale adjustment to their existing tissue scenes. Chapters 01–02, the historical image source, the local-only contact workflow and the sibling project are unchanged.
+- New `tests/lower-story.mjs` first failed on the prior dark service surface, then passed the distinct chapter treatments, process/scene ordering, image source-size limit, team caveat placement and mobile flow. The existing responsive regression now checks non-overlap against the new left-process/right-scene order rather than assuming the old placement.
+- `npm.cmd test`: 28/28 pass. `tests/continuous-browser.mjs`, `tests/responsive-browser.mjs` (nine viewport sizes), `tests/solution-interaction.mjs`, `tests/scroll-reveal.mjs`, `tests/spatial-lens.mjs`, `tests/business.mjs`, `tests/approved-ui.mjs` and the production build pass. Browser checks include navigation/history, keyboard selection, consultation draft download, pause/reduced motion and nonblank 3D pixels.
+- Fresh 1440x900, 1024x768 and 390x844 chapter screenshots are in `test-results/visual-audit/`. Horizontal overflow is zero at all three widths; the responsive suite also confirms 1920x1080 and six other sizes. Historical case and team information, publication rights, actual service/outputs and formal contact details still need company confirmation before public release.
+- An independent screenshot-only review found the mobile research image appearing before the research question and the mobile feature map too small. Both were corrected and rechecked at 390px; the nine-viewport and continuous-browser suites passed again. The reviewer inherited the current Codex model; exact model identifier and billing were not provided by the platform. Team image consistency remains limited by the historical source files.
+
 ## v0.1.0-preview Release / 2026-09-24
 
 - Rebuilt `dist` with Vite and packaged its 18 files into `releases/v0.1.0-preview/cartabio-v0.1.0-preview-static.zip`; archive contents match `dist` exactly. SHA-256: `72674C433614496FA49855B44157DC79D465A4096EE903A5DFB2F6D60EF7EA60`.

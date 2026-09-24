@@ -3,13 +3,13 @@ import {PNG} from 'pngjs';
 import assert from 'node:assert/strict';
 import {mkdir,readFile} from 'node:fs/promises';
 
-const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,args:['--enable-webgl','--use-angle=d3d11']});
+const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',args:['--enable-webgl','--use-angle=d3d11']});
 const output='test-results/continuous';
 await mkdir(output,{recursive:true});
 const errors=[];
 const page=await browser.newPage({viewport:{width:1440,height:900},acceptDownloads:true});
 page.on('pageerror',error=>errors.push(error.message));
-const url='http://127.0.0.1:5188/';
+const url='http://127.0.0.1:5188/legacy.html';
 const scrollTo=async selector=>{
   await page.locator(selector).evaluate(el=>el.scrollIntoView({behavior:'instant',block:'start'}));
   await page.waitForTimeout(250);
@@ -34,7 +34,7 @@ try{
   await page.waitForTimeout(1100);
   assert.ok(await page.evaluate(()=>scrollY)<100,'keyboard Home returns to the top');
   await page.locator('.header a[href="#platform"]').click();
-  await page.waitForTimeout(900);
+  await page.waitForFunction(()=>document.body.dataset.activePanel==='3',null,{timeout:5000});
   assert.equal(new URL(page.url()).hash,'#platform');
   assert.equal(await page.locator('body').getAttribute('data-active-panel'),'3');
   await page.goBack();
