@@ -48,12 +48,6 @@ try{
     await page.close();
     console.log(`${width}px homepage, consultation draft and content notes passed`);
   }
-  const archive=await browser.newPage();
-  const response=await archive.goto('http://127.0.0.1:5188/legacy.html',{waitUntil:'domcontentloaded'});
-  assert.equal(response.status(),200);
-  assert.ok(await archive.locator('#inquiry').count());
-  await archive.close();
-  console.log('Legacy homepage preserved');
 }finally{
   await browser.close();
 }

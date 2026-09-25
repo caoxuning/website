@@ -3,8 +3,7 @@ import {mkdir,readFile} from 'node:fs/promises';
 import {chromium} from '@playwright/test';
 
 const home=await readFile(new URL('../index.html',import.meta.url),'utf8');
-const preview=await readFile(new URL('../design-preview.html',import.meta.url),'utf8');
-assert.equal(home,preview,'homepage and preview should present the same approved copy');
+assert.doesNotMatch(home,/design-preview\.html|legacy\.html/,'homepage should have one current entry');
 await mkdir('test-results/content-audit',{recursive:true});
 
 const browser=await chromium.launch({

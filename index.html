@@ -8,7 +8,8 @@
     <title>cartabio | 固定样本研究、空间数据与 AI</title>
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="preload" href="/manrope.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="/design-preview.css" />
+    <link rel="stylesheet" href="/src/site.css" />
+    <script>if(location.protocol==='file:')addEventListener('DOMContentLoaded',()=>{document.body.innerHTML='<main style="font:18px/1.7 system-ui,sans-serif;max-width:36em;margin:15vh auto;padding:0 24px;color:#172124"><h1 style="font-size:28px">请双击 START_HERE.cmd 打开网站</h1><p>此网站需要在本地服务中运行，不能直接双击 index.html。启动后浏览器会自动打开主页。</p></main>'})</script>
   </head>
   <body>
     <header class="site-header" id="site-header">
@@ -114,6 +115,6 @@
     <dialog id="research-dialog" aria-labelledby="research-dialog-title"><div class="dialog-top"><span>IMAGE ARCHIVE / 01</span><button class="dialog-close" type="button" data-close aria-label="关闭"><i data-lucide="x" aria-hidden="true"></i></button></div><h2 id="research-dialog-title">图像资料说明</h2><p>展示图来自历史网站素材。其样本来源、染色方法、标志物面板、是否采用 SAFE，以及与历史项目的对应关系，目前均待核实。</p><p>这张图用于呈现组织图像这一研究场景，不作为公司 SAFE 性能或客户项目结果的证据。正式案例需要配套样本与方法信息、原始图和分析结果、验证材料及公开授权。</p></dialog>
     <dialog id="contact-dialog" aria-labelledby="contact-title"><form id="contact-form"><div class="dialog-top"><span>PROJECT CONVERSATION</span><button class="dialog-close" type="button" data-close aria-label="关闭"><i data-lucide="x" aria-hidden="true"></i></button></div><h2 id="contact-title">从研究问题开始。</h2><p>填写项目兴趣，生成一份本地咨询草稿，便于后续整理讨论。</p><label>姓名<input name="name" autocomplete="name" required maxlength="100" /></label><label>电子邮箱<input name="email" type="email" autocomplete="email" required maxlength="180" /></label><label>研究问题或合作方向<textarea name="message" rows="4" required maxlength="3000"></textarea></label><button type="submit" class="submit-button">下载咨询项目草稿 <i data-lucide="download" aria-hidden="true"></i></button><small>此预览未接入邮件、CRM 或服务器。信息只会生成本地文件，不会发送或保存。</small><p id="form-status" role="status"></p></form></dialog>
     <dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-top"><span>PROJECT NOTE</span><button class="dialog-close" type="button" data-close aria-label="关闭"><i data-lucide="x" aria-hidden="true"></i></button></div><h2 id="about-title">关于 cartabio 概念站</h2><p>本站聚焦固定细胞与组织切片研究。三维组织、染色循环、空间连线和选区均为程序原理示意，不代表实验数据或已验证的 AI 分析结果。</p><p><a href="https://doi.org/10.1038/s41587-022-01339-6" target="_blank" rel="noopener noreferrer">SAFE 原始方法论文</a>展示的是活细胞与活组织应用；本站所述固定样本合作方向来自项目定位，不以该论文推定公司方案的适用范围或性能。</p><p>正式发布前仍需核实历史图像来源与授权、团队现任职位、服务范围和正式联系信息。</p></dialog>
-    <script type="module" src="/src/design-preview.js"></script>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>

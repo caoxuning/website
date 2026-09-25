@@ -1,5 +1,11 @@
 # Verification / 2026-09-22
 
+## v0.2.1-preview Offline Package / 2026-09-25
+
+- One current homepage, 15-file ZIP. Legacy/duplicate pages and unused assets are absent from the production build. `file://` displays launch guidance, while the Windows launcher serves the page over loopback HTTP with no external runtime.
+- `npm.cmd test`: 12 current scene/frame-loop tests pass. Homepage, four-viewport story/canvas, content-boundary, and offline-launcher checks pass. ZIP entries match `dist` by SHA-256; package SHA-256 is `A7FD4EF6023F4E21FB5516AB2F76C2627FBAF43E6F6724E82FE5506617EA60E1`.
+- The release remains a preview pending the source and business confirmations in `docs/content-audit.md`.
+
 ## v0.2.0-preview Release / 2026-09-25
 
 - `npm.cmd test`: 28/28 passing. Homepage, story, legacy, and content-audit browser checks passed; story/canvas coverage includes 1920x1080, 1440x900, 1024x768 and 390x844, with no horizontal overflow, page errors or missing images. The story checks cover moving/nonblank 3D pixels, pointer response, pause, reduced motion, anchors and history. Local consultation draft download remains verified.

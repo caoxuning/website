@@ -3,7 +3,7 @@ import {mkdir} from 'node:fs/promises';
 import {chromium} from '@playwright/test';
 import {PNG} from 'pngjs';
 
-const screenshotDir='test-results/design-preview';
+const screenshotDir='test-results/site';
 await mkdir(screenshotDir,{recursive:true});
 
 function changedPixels(first,second){
@@ -26,7 +26,7 @@ try{
     const page=await browser.newPage({viewport:{width,height}});
     const errors=[];
     page.on('pageerror',error=>errors.push(error.message));
-    const response=await page.goto('http://127.0.0.1:5188/design-preview.html',{waitUntil:'networkidle'});
+    const response=await page.goto('http://127.0.0.1:5188/',{waitUntil:'networkidle'});
     assert.equal(response.status(),200);
     assert.equal(await page.locator('.story-beat').count(),6);
     assert.equal(await page.locator('#story-canvas').count(),1);
@@ -91,7 +91,7 @@ try{
   }
 
   const reduced=await browser.newPage({viewport:{width:1024,height:768},reducedMotion:'reduce'});
-  await reduced.goto('http://127.0.0.1:5188/design-preview.html',{waitUntil:'networkidle'});
+  await reduced.goto('http://127.0.0.1:5188/',{waitUntil:'networkidle'});
   assert.equal(await reduced.locator('.story-world').getAttribute('data-motion'),'reduced');
   assert.equal(await reduced.locator('.story-line').first().evaluate(element=>getComputedStyle(element).opacity),'1');
   await reduced.close();
@@ -100,7 +100,7 @@ try{
   for(const [width,height] of [[1440,900],[390,844]]){
     const page=await browser.newPage({viewport:{width,height}});
     for(const hash of ['#evidence','#people']){
-      await page.goto(`http://127.0.0.1:5188/design-preview.html${hash}`,{waitUntil:'networkidle'});
+      await page.goto(`http://127.0.0.1:5188/${hash}`,{waitUntil:'networkidle'});
       const geometry=await page.evaluate(id=>({
         titleTop:document.querySelector(`#${id} h2`).getBoundingClientRect().top,
         headerHeight:document.getElementById('site-header').getBoundingClientRect().height,
@@ -114,7 +114,7 @@ try{
   console.log('Direct anchors passed');
 
   const historyPage=await browser.newPage({viewport:{width:1440,height:900}});
-  await historyPage.goto('http://127.0.0.1:5188/design-preview.html',{waitUntil:'networkidle'});
+  await historyPage.goto('http://127.0.0.1:5188/',{waitUntil:'networkidle'});
   await historyPage.locator('.site-header nav a[href="#evidence"]').click();
   assert.equal(new URL(historyPage.url()).hash,'#evidence');
   await historyPage.waitForFunction(()=>document.getElementById('site-header').classList.contains('is-light'));
@@ -125,7 +125,7 @@ try{
   console.log('Navigation history passed');
 
   const revealPage=await browser.newPage({viewport:{width:1440,height:900}});
-  await revealPage.goto('http://127.0.0.1:5188/design-preview.html',{waitUntil:'networkidle'});
+  await revealPage.goto('http://127.0.0.1:5188/',{waitUntil:'networkidle'});
   const titleY=await revealPage.locator('#people h2').evaluate(element=>element.getBoundingClientRect().top+scrollY);
   await revealPage.evaluate(y=>scrollTo(0,y),titleY-900*.96);
   await revealPage.waitForTimeout(550);

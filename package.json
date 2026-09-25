@@ -1,7 +1,7 @@
 {
   "name": "cartabio-living-systems",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5188 --strictPort",
@@ -9,20 +9,8 @@
     "test": "node --test tests/*.test.js",
     "test:browser": "node tests/homepage-promotion.mjs",
     "test:story": "node tests/story-preview.mjs",
-    "test:legacy": "node tests/continuous-browser.mjs",
-    "test:continuous": "node tests/continuous-browser.mjs",
-    "test:responsive": "node tests/responsive-browser.mjs",
-    "test:lower-story": "node tests/lower-story.mjs",
-    "test:reveal": "node tests/scroll-reveal.mjs",
-    "test:hero-scroll": "node tests/hero-scroll-diagnostic.mjs",
-    "test:business": "node tests/business.mjs",
-    "test:scroll": "node tests/continuous-browser.mjs",
-    "test:refinement": "node tests/continuous-browser.mjs",
-    "test:footer": "node tests/continuous-browser.mjs",
-    "test:interaction": "node tests/solution-interaction.mjs",
-    "test:approved-ui": "node tests/approved-ui.mjs",
-    "test:performance": "node tests/performance.mjs after",
-    "test:performance:gpu": "node tests/performance.mjs after-gpu --gpu"
+    "test:content": "node tests/content-audit.mjs",
+    "test:offline": "node tests/offline-package.mjs"
   },
   "dependencies": {
     "gsap": "^3.15.0",

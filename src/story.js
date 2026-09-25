@@ -40,20 +40,6 @@ export function registrationOffset(time,channel){
   return offset.map(value=>value*amount);
 }
 
-export function storyState(progress) {
-  const phase = Math.max(0, Math.min(2, progress));
-  return { phase, network: smooth(phase), computation: smooth(phase - 1) };
-}
-
-export function cellPositions() {
-  return [
-    [0.2, 0.05, 1.2, 1.58], [2.55, 1.6, -0.2, 1.12], [-1.75, 2.15, -0.8, 1.22],
-    [-2.55, -0.35, -0.9, 1.0], [1.75, -2.12, -0.5, 1.3], [-1.0, -2.65, -1.0, 1.14],
-    [3.05, -0.78, -1.2, 0.86], [0.7, 3.35, -1.5, 0.94], [-3.25, 2.8, -2.2, 0.72],
-    [3.7, 3.25, -2.5, 0.77], [-3.25, -2.7, -2.4, 0.67], [3.85, -3.15, -2.0, 0.65],
-  ];
-}
-
 export function narrativeFrame(mode,time,entrance=1){
   const stage=Math.max(0,Math.min(2,mode));
   const settled=1-(1-clamp(entrance))**3;
